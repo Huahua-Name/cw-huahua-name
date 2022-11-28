@@ -12,6 +12,7 @@ pub struct InstantiateMsg {
 pub enum ExecuteMsg {
     Register { name: String },
     Transfer { name: String, to: String },
+    Refund {},
 }
 
 #[cw_serde]
