@@ -16,6 +16,12 @@ pub enum ExecuteMsg {
 }
 
 #[cw_serde]
+pub struct MigrateMsg {
+    // pub purchase_price: Option<Coin>,
+    // pub transfer_price: Option<Coin>,
+}
+
+#[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
     // ResolveAddress returns the current address that the name resolves to
@@ -23,6 +29,8 @@ pub enum QueryMsg {
     ResolveRecord { name: String },
     #[returns(ConfigResponse)]
     Config {},
+    #[returns(ContractResponse)]
+    Contract {},
 }
 
 // We define a custom struct for each query response
@@ -35,6 +43,11 @@ pub struct ResolveRecordResponse {
 pub struct ConfigResponse {
     pub purchase_price: Option<Coin>,
     pub transfer_price: Option<Coin>,
+}
+
+#[cw_serde]
+pub struct ContractResponse {
+    pub version: Option<String>,
 }
 
 impl From<Config> for ConfigResponse {

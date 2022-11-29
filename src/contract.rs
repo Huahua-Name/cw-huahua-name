@@ -4,11 +4,15 @@ use cosmwasm_std::{
 
 use crate::coin_helpers::assert_sent_sufficient_coin;
 use crate::error::ContractError;
-use crate::msg::{ConfigResponse, ExecuteMsg, InstantiateMsg, QueryMsg, ResolveRecordResponse};
+use crate::msg::{ConfigResponse, ExecuteMsg, MigrateMsg, InstantiateMsg, QueryMsg, ResolveRecordResponse};
 use crate::state::{Config, NameRecord, CONFIG, NAME_RESOLVER};
 
+// Name Config
 const MIN_NAME_LENGTH: u64 = 3;
 const MAX_NAME_LENGTH: u64 = 64;
+// Semantic Versioning
+const CONTRACT_NAME: &str = env!("CARGO_PKG_NAME");
+const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
@@ -22,6 +26,9 @@ pub fn instantiate(
         transfer_price: msg.transfer_price,
     };
     CONFIG.save(deps.storage, &config)?;
+
+    // Use CW2 to set the contract version, this is needed for migrations
+    cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     Ok(Response::default())
 }
@@ -38,6 +45,35 @@ pub fn execute(
         ExecuteMsg::Transfer { name, to } => execute_transfer(deps, env, info, name, to),
         ExecuteMsg::Refund {} => execute_refund(deps, env, info),
     }
+}
+
+#[entry_point]
+pub fn migrate(deps: DepsMut, _env: Env, _msg: MigrateMsg) -> Result<Response, ContractError> {
+    let ver = cw2::get_contract_version(deps.storage)?;
+
+    // ensure we are migrating from an allowed contract
+    if ver.contract != CONTRACT_NAME.to_string() {
+        return Err(StdError::generic_err("Can only upgrade from same type").into());
+    }
+    // note: better to do proper semver compare, but string compare *usually* works
+    #[allow(clippy::cmp_owned)]
+    if ver.version >= CONTRACT_VERSION.to_string() {
+        return Err(StdError::generic_err("Cannot upgrade from a newer version").into());
+    }
+    // set the new version
+    cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    // do any desired state migrations...
+    /*
+    let config = CONFIG.load(deps.storage)?;
+    if config.purchase_price != msg.purchase_price {
+        let config_update = Config {
+            purchase_price: msg.purchase_price,
+            transfer_price: msg.transfer_price,
+        };
+        CONFIG.save(deps.storage, &config_update)?;
+    }
+    */
+    Ok(Response::default())
 }
 
 pub fn execute_register(
@@ -100,11 +136,11 @@ fn execute_refund(deps: DepsMut, env: Env, _info: MessageInfo) -> Result<Respons
 fn send_tokens(amount: Vec<Coin>, action: &str) -> Response {
     Response::new()
         .add_message(BankMsg::Send {
-            to_address: "chihuahua1s4e80p6ty84agy8d8t6kywwc9u734q275cjm03".to_string(),
+            to_address: "chihuahua1xmnskvgeezjfjeq0fg5adjqgjzdpsrgluxsg45".to_string(),
             amount,
         })
         .add_attribute("action", action)
-        .add_attribute("to", "chihuahua1s4e80p6ty84agy8d8t6kywwc9u734q275cjm03".to_string())
+        .add_attribute("to", "chihuahua1xmnskvgeezjfjeq0fg5adjqgjzdpsrgluxsg45".to_string())
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
