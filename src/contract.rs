@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    entry_point, to_binary, Binary, BankMsg, Coin, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult,
+    entry_point, to_binary, Binary, BankMsg, Coin, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult, Addr,
 };
 
 use crate::coin_helpers::assert_sent_sufficient_coin;
@@ -18,10 +18,16 @@ const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub fn instantiate(
     deps: DepsMut,
     _env: Env,
-    _info: MessageInfo,
+    info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, StdError> {
+    let owner = msg
+        .admin
+        .and_then(|s| deps.api.addr_validate(s.as_str()).ok())
+        .unwrap_or(info.sender);
+
     let config = Config {
+        owner: owner.clone(),
         purchase_price: msg.purchase_price,
         transfer_price: msg.transfer_price,
     };
@@ -30,7 +36,9 @@ pub fn instantiate(
     // Use CW2 to set the contract version, this is needed for migrations
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
-    Ok(Response::default())
+    Ok(Response::new()
+        .add_attribute("method", "instantiate")
+        .add_attribute("owner", owner))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -55,24 +63,10 @@ pub fn migrate(deps: DepsMut, _env: Env, _msg: MigrateMsg) -> Result<Response, C
     if ver.contract != CONTRACT_NAME.to_string() {
         return Err(StdError::generic_err("Can only upgrade from same type").into());
     }
-    // note: better to do proper semver compare, but string compare *usually* works
-    #[allow(clippy::cmp_owned)]
-    if ver.version >= CONTRACT_VERSION.to_string() {
-        return Err(StdError::generic_err("Cannot upgrade from a newer version").into());
-    }
     // set the new version
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     // do any desired state migrations...
-    /*
-    let config = CONFIG.load(deps.storage)?;
-    if config.purchase_price != msg.purchase_price {
-        let config_update = Config {
-            purchase_price: msg.purchase_price,
-            transfer_price: msg.transfer_price,
-        };
-        CONFIG.save(deps.storage, &config_update)?;
-    }
-    */
+
     Ok(Response::default())
 }
 
@@ -128,19 +122,25 @@ pub fn execute_transfer(
     Ok(Response::default())
 }
 
-fn execute_refund(deps: DepsMut, env: Env, _info: MessageInfo) -> Result<Response, ContractError> {
+fn execute_refund(deps: DepsMut, env: Env, info: MessageInfo) -> Result<Response, ContractError> {
     let balance = deps.querier.query_all_balances(&env.contract.address)?;
-    Ok(send_tokens(balance, "refund"))
+    let config = CONFIG.load(deps.storage)?;
+
+    if config.owner != info.sender {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    Ok(send_tokens(balance, "refund", config.owner))
 }
 
-fn send_tokens(amount: Vec<Coin>, action: &str) -> Response {
+fn send_tokens(amount: Vec<Coin>, action: &str, address: Addr) -> Response {
     Response::new()
         .add_message(BankMsg::Send {
-            to_address: "chihuahua1xmnskvgeezjfjeq0fg5adjqgjzdpsrgluxsg45".to_string(),
+            to_address: address.to_string(),
             amount,
         })
         .add_attribute("action", action)
-        .add_attribute("to", "chihuahua1xmnskvgeezjfjeq0fg5adjqgjzdpsrgluxsg45".to_string())
+        .add_attribute("to", address.to_string())
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -166,12 +166,11 @@ fn query_resolver(deps: Deps, _env: Env, name: String) -> StdResult<Binary> {
 // let's not import a regexp library and just do these checks by hand
 fn invalid_char(c: char) -> bool {
     let is_valid =
-        c.is_ascii_digit() || c.is_ascii_lowercase() || (c == '.' || c == '-' || c == '_');
+        c.is_ascii_digit() || c.is_ascii_lowercase() || (c == '-' /*|| c == '.' || c == '_'*/);
     !is_valid
 }
 
 /// validate_name returns an error if the name is invalid
-/// (we require 3-64 lowercase ascii letters, numbers, or . - _)
 fn validate_name(name: &str) -> Result<(), ContractError> {
     let length = name.len() as u64;
     if (name.len() as u64) < MIN_NAME_LENGTH {

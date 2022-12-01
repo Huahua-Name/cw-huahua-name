@@ -4,6 +4,7 @@ use cw_storage_plus::{Item, Map};
 
 #[cw_serde]
 pub struct Config {
+    pub owner: Addr,
     pub purchase_price: Option<Coin>,
     pub transfer_price: Option<Coin>,
 }

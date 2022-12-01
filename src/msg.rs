@@ -1,9 +1,10 @@
 use crate::state::Config;
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::Coin;
+use cosmwasm_std::{Addr, Coin};
 
 #[cw_serde]
 pub struct InstantiateMsg {
+    pub admin: Option<String>,
     pub purchase_price: Option<Coin>,
     pub transfer_price: Option<Coin>,
 }
@@ -37,6 +38,7 @@ pub struct ResolveRecordResponse {
 
 #[cw_serde]
 pub struct ConfigResponse {
+    pub owner: Addr,
     pub purchase_price: Option<Coin>,
     pub transfer_price: Option<Coin>,
 }
@@ -44,6 +46,7 @@ pub struct ConfigResponse {
 impl From<Config> for ConfigResponse {
     fn from(config: Config) -> ConfigResponse {
         ConfigResponse {
+            owner: config.owner,
             purchase_price: config.purchase_price,
             transfer_price: config.transfer_price,
         }
