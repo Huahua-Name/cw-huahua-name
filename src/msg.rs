@@ -7,13 +7,16 @@ pub struct InstantiateMsg {
     pub admin: Option<String>,
     pub purchase_price: Option<Coin>,
     pub transfer_price: Option<Coin>,
+    pub edit_price: Option<Coin>,
 }
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    Register { name: String },
+    Register { name: String, bio: String, website: String },
     Transfer { name: String, to: String },
     Refund {},
+    Edit { name: String, bio: String, website: String },
+    Editconf { purchase_price: Option<Coin>, transfer_price: Option<Coin>, edit_price: Option<Coin> },
 }
 
 #[cw_serde]
@@ -34,6 +37,8 @@ pub enum QueryMsg {
 #[cw_serde]
 pub struct ResolveRecordResponse {
     pub address: Option<String>,
+    pub bio: Option<String>,
+    pub website: Option<String>
 }
 
 #[cw_serde]
@@ -41,6 +46,7 @@ pub struct ConfigResponse {
     pub owner: Addr,
     pub purchase_price: Option<Coin>,
     pub transfer_price: Option<Coin>,
+    pub edit_price: Option<Coin>,
 }
 
 impl From<Config> for ConfigResponse {
@@ -49,6 +55,7 @@ impl From<Config> for ConfigResponse {
             owner: config.owner,
             purchase_price: config.purchase_price,
             transfer_price: config.transfer_price,
+            edit_price: config.edit_price,
         }
     }
 }

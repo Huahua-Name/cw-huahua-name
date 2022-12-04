@@ -7,11 +7,14 @@ pub struct Config {
     pub owner: Addr,
     pub purchase_price: Option<Coin>,
     pub transfer_price: Option<Coin>,
+    pub edit_price: Option<Coin>,
 }
 
 #[cw_serde]
 pub struct NameRecord {
     pub owner: Addr,
+    pub bio: String,
+    pub website: String,
 }
 
 pub const CONFIG: Item<Config> = Item::new("config");

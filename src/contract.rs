@@ -30,6 +30,7 @@ pub fn instantiate(
         owner: owner.clone(),
         purchase_price: msg.purchase_price,
         transfer_price: msg.transfer_price,
+        edit_price: msg.edit_price,
     };
     CONFIG.save(deps.storage, &config)?;
 
@@ -49,9 +50,12 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        ExecuteMsg::Register { name } => execute_register(deps, env, info, name),
+        ExecuteMsg::Register { name, bio, website } => execute_register(deps, env, info, name, bio, website),
         ExecuteMsg::Transfer { name, to } => execute_transfer(deps, env, info, name, to),
         ExecuteMsg::Refund {} => execute_refund(deps, env, info),
+        ExecuteMsg::Edit { name, bio, website } => execute_edit(deps, env, info, name, bio, website),
+        ExecuteMsg::Editconf { purchase_price, transfer_price, edit_price } => execute_edit_conf(deps, env, info, purchase_price, transfer_price, edit_price),
+
     }
 }
 
@@ -75,6 +79,8 @@ pub fn execute_register(
     _env: Env,
     info: MessageInfo,
     name: String,
+    bio: String,
+    website: String,
 ) -> Result<Response, ContractError> {
     // we only need to check here - at point of registration
     validate_name(&name)?;
@@ -82,7 +88,11 @@ pub fn execute_register(
     assert_sent_sufficient_coin(&info.funds, config.purchase_price)?;
 
     let key = name.as_bytes();
-    let record = NameRecord { owner: info.sender };
+    let record = NameRecord {
+        owner: info.sender,
+        bio: bio,
+        website: website
+    };
 
     if (NAME_RESOLVER.may_load(deps.storage, key)?).is_some() {
         // name is already taken
@@ -122,6 +132,60 @@ pub fn execute_transfer(
     Ok(Response::default())
 }
 
+pub fn execute_edit(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    name: String,
+    bio: String,
+    website: String,
+) -> Result<Response, ContractError> {
+    let config = CONFIG.load(deps.storage)?;
+    assert_sent_sufficient_coin(&info.funds, config.transfer_price)?;
+
+    let key = name.as_bytes();
+    NAME_RESOLVER.update(deps.storage, key, |record| {
+        if let Some(mut record) = record {
+            if info.sender != record.owner {
+                return Err(ContractError::Unauthorized {});
+            }
+
+            record.bio = bio.clone();
+            record.website = website.clone();
+            Ok(record)
+        } else {
+            Err(ContractError::NameNotExists { name: name.clone() })
+        }
+    })?;
+    Ok(Response::default())
+}
+
+pub fn execute_edit_conf(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    purchase_price: Option<Coin>,
+    transfer_price: Option<Coin>,
+    edit_price: Option<Coin>,
+) -> Result<Response, ContractError> {
+    let get_config = CONFIG.load(deps.storage)?;
+    assert_sent_sufficient_coin(&info.funds, get_config.transfer_price)?;
+
+    if get_config.owner != info.sender {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    // CONFIG.update(deps.storage, FnOnce::<&Config,>);
+    CONFIG.update(deps.storage, |mut config| -> StdResult<_> {
+        config.purchase_price = purchase_price.clone();
+        config.transfer_price = transfer_price.clone();
+        config.edit_price = edit_price.clone();
+        Ok(config)
+    })?;
+
+    Ok(Response::default())
+}
+
 fn execute_refund(deps: DepsMut, env: Env, info: MessageInfo) -> Result<Response, ContractError> {
     let balance = deps.querier.query_all_balances(&env.contract.address)?;
     let config = CONFIG.load(deps.storage)?;
@@ -158,7 +222,16 @@ fn query_resolver(deps: Deps, _env: Env, name: String) -> StdResult<Binary> {
         Some(record) => Some(String::from(&record.owner)),
         None => None,
     };
-    let resp = ResolveRecordResponse { address };
+    let bio = match NAME_RESOLVER.may_load(deps.storage, key)? {
+        Some(record) => Some(String::from(&record.bio)),
+        None => None,
+    };
+    let website = match NAME_RESOLVER.may_load(deps.storage, key)? {
+        Some(record) => Some(String::from(&record.website)),
+        None => None,
+    };
+
+    let resp = ResolveRecordResponse { address, bio, website };
 
     to_binary(&resp)
 }
