@@ -30,6 +30,10 @@ Docker (Optimized Compilation)
     --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \  
     cosmwasm/rust-optimizer:0.12.6
 
+#### Schema
+
+    cargo schema
+
 #### Upload contract
 
     chihuahuad tx wasm store artifacts/cw_huahua_name.wasm --from wallet --node https://chihuahua-testnet-rpc.polkachu.com:443 --chain-id chitestnet-5 --gas-prices 0.25uhuahua --gas auto --gas-adjustment 1.3 -y --output json -b block 
