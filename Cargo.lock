@@ -194,7 +194,7 @@ dependencies = [
 
 [[package]]
 name = "cw-huahua-name"
-version = "0.2.10"
+version = "0.2.14"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",

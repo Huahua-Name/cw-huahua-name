@@ -1,7 +1,7 @@
 [package]
 name = "cw-huahua-name"
 description = "CosmWasm name service for chihuahua chain"
-version = "0.2.10"
+version = "0.2.14"
 authors = ["atmon3r <contact.atmoner@gmail.com>"]
 edition = "2021"
 license = "Apache-2.0"

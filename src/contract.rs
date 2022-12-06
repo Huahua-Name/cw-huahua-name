@@ -9,7 +9,9 @@ use crate::state::{Config, NameRecord, CONFIG, NAME_RESOLVER};
 
 // Name Config
 const MIN_NAME_LENGTH: u64 = 3;
-const MAX_NAME_LENGTH: u64 = 64;
+const MAX_NAME_LENGTH: u64 = 30;
+const MAX_BIO_LENGTH: u64 = 200;
+const MAX_WEBSITE_LENGTH: u64 = 100;
 // Semantic Versioning
 const CONTRACT_NAME: &str = env!("CARGO_PKG_NAME");
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -88,16 +90,33 @@ pub fn execute_register(
     assert_sent_sufficient_coin(&info.funds, config.purchase_price)?;
 
     let key = name.as_bytes();
-    let record = NameRecord {
-        owner: info.sender,
-        bio: bio,
-        website: website
-    };
+    let bio_length = bio.len() as u64;
+    let website_length = website.len() as u64;
+
+    if (bio_length) > MAX_BIO_LENGTH {
+        return Err(ContractError::BioTooLong {
+            bio_length,
+            max_length: MAX_BIO_LENGTH,
+        })
+    }
+
+    if (website_length) > MAX_WEBSITE_LENGTH {
+        return Err(ContractError::WebsiteTooLong {
+            website_length,
+            max_length: MAX_WEBSITE_LENGTH,
+        })
+    }
 
     if (NAME_RESOLVER.may_load(deps.storage, key)?).is_some() {
         // name is already taken
         return Err(ContractError::NameTaken { name });
     }
+
+    let record = NameRecord {
+        owner: info.sender,
+        bio: bio,
+        website: website
+    };
 
     // name is available
     NAME_RESOLVER.save(deps.storage, key, &record)?;
@@ -141,13 +160,30 @@ pub fn execute_edit(
     website: String,
 ) -> Result<Response, ContractError> {
     let config = CONFIG.load(deps.storage)?;
-    assert_sent_sufficient_coin(&info.funds, config.transfer_price)?;
+    assert_sent_sufficient_coin(&info.funds, config.edit_price)?;
 
     let key = name.as_bytes();
+    let bio_length = bio.len() as u64;
+    let website_length = website.len() as u64;
+
     NAME_RESOLVER.update(deps.storage, key, |record| {
         if let Some(mut record) = record {
             if info.sender != record.owner {
                 return Err(ContractError::Unauthorized {});
+            }
+
+            if (bio_length) > MAX_BIO_LENGTH {
+                return Err(ContractError::BioTooLong {
+                    bio_length,
+                    max_length: MAX_BIO_LENGTH,
+                })
+            }
+
+            if (website_length) > MAX_WEBSITE_LENGTH {
+                return Err(ContractError::WebsiteTooLong {
+                    website_length,
+                    max_length: MAX_WEBSITE_LENGTH,
+                })
             }
 
             record.bio = bio.clone();
