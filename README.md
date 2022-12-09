@@ -23,9 +23,11 @@ You can perform these actions from chihuahuad or from our interface on [huahua-n
 
 | Key | Value |
 |--|--|
+| Network  | Mainnet |
+| Chain id | chihuahua-1 |
 | Code id  | 157 |
-| Contract address | chihuahua1taheysd5agm8jxh3zv8r545nazsg2ye0samdn55g7jexnsz678hqwpzwz9 |
-| Instantiate tx | C9B9F9B47190CFB5064ED03B362997BA1CE5452FFEC256BA6F3B169305181688 |
+| Contract address |chihuahua1taheysd5agm8jxh3zv8r545nazsg2ye0samdn55g7jexnsz678hqwpzwz9 |
+| Instantiate tx |C9B9F9B47190CFB5064ED03B362997BA1CE5452FFEC256BA6F3B169305181688 |
 
 ### Use contract ###
 
