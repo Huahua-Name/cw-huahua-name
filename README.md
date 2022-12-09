@@ -12,7 +12,8 @@
 
 ### What is Huahua-name? ###
 
-The purpose of this smartcontract is to assign a name to an address with personalized data. This data is editable only by the name administrator.
+The purpose of this smartcontract is to assign a name to an address with personalized data.  
+This data is editable only by the name administrator.  
 It is also possible to transfer the names to another address.
 
 You can perform these actions from chihuahuad or from our interface on [huahua-name.wtf](https://huahua-name.wtf/)  
