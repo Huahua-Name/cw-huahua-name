@@ -8,7 +8,7 @@
 *   [What is Huahua-name?](#what-is-huahua-name "What is Huahua-name?")
 *   [Current contract](#current-contract "Current contract")
 *   [Use contract](#use-contract "Use contract")
-*   [Credit](#credit "Credit")
+*   [Credits](#credits "Credits")
 
 ### What is Huahua-name? ###
 
@@ -33,6 +33,6 @@ You can perform these actions from chihuahuad or from our interface on [huahua-n
 
 Soon
 
-### Credit ###
+### Credits ###
 
 We have used the [nameservice](https://github.com/deus-labs/cw-contracts/tree/main/contracts/nameservice) code that we have improved.
