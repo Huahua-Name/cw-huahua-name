@@ -8,14 +8,15 @@
 *   [What is Huahua-name?](#what-is-huahua-name "What is Huahua-name?")
 *   [Current contract](#current-contract "Current contract")
 *   [Use contract](#use-contract "Use contract")
+*   [Credit](#credit "Credit")
 
 ### What is Huahua-name? ###
 
-The goal of the application you are building is to let users buy names and to set a value these names resolve to.
-The owner of a given name will be the current highest bidder. In this section, you will learn how these simple
- requirements translate to application design.
+The purpose of this smartcontract is to assign a name to an address with personalized data. This data is editable only by the name administrator.
+It is also possible to transfer the names to another address.
 
-We have used the [nameservice](https://github.com/deus-labs/cw-contracts/tree/main/contracts/nameservice) code that we have improved.
+You can perform these actions from chihuahuad or from our interface on [huahua-name.wtf](https://huahua-name.wtf/)  
+
 
 ### Current contract ###
 
@@ -28,3 +29,7 @@ We have used the [nameservice](https://github.com/deus-labs/cw-contracts/tree/ma
 ### Use contract ###
 
 Soon
+
+### Credit ###
+
+We have used the [nameservice](https://github.com/deus-labs/cw-contracts/tree/main/contracts/nameservice) code that we have improved.
