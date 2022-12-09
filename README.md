@@ -3,6 +3,12 @@
 
 # Huahua-name
 
+
+| Key | Value |
+|--|--|
+| Code id  | 157 |
+| Contract address |  |
+
 We have used the nameservice code that we have improved.  
 You can find the informations here:  
 - [tutorial](https://docs.cosmwasm.com/tutorials/name-service/intro)  
