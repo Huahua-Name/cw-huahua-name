@@ -7,6 +7,7 @@
 
 *   [What is Huahua-name?](#what-is-huahua-name "What is Huahua-name?")
 *   [Current contract](#current-contract "Current contract")
+*   [Current config](#current-config "Current config")
 *   [Use contract](#use-contract "Use contract")
 *   [Credits](#credits "Credits")
 
@@ -26,8 +27,17 @@ You can perform these actions from chihuahuad or from our interface on [huahua-n
 | Network  | Mainnet |
 | Chain id | chihuahua-1 |
 | Code id  | 157 |
+| Contract admin |chihuahua1s4e80p6ty84agy8d8t6kywwc9u734q275cjm03 |
 | Contract address |chihuahua1taheysd5agm8jxh3zv8r545nazsg2ye0samdn55g7jexnsz678hqwpzwz9 |
 | Instantiate tx |C9B9F9B47190CFB5064ED03B362997BA1CE5452FFEC256BA6F3B169305181688 |
+
+### Current config ###
+
+| Key | Value |
+|--|--|
+| purchase_price  | 20000 HUAHUA |
+| transfer_price | 20000 HUAHUA |
+| edit_price | 1000 HUAHUA | 
 
 ### Use contract ###
 
