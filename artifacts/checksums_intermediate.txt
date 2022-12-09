@@ -1,0 +1,1 @@
+06dd77b0e966866946a3e36ed7c8c4226758289c5cb71b97faa87142daa6475f  ./target/wasm32-unknown-unknown/release/cw_huahua_name.wasm
