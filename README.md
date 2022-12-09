@@ -7,7 +7,9 @@
 | Key | Value |
 |--|--|
 | Code id  | 157 |
-| Contract address |  |
+| Contract address | chihuahua1taheysd5agm8jxh3zv8r545nazsg2ye0samdn55g7jexnsz678hqwpzwz9 |
+| Instanciate tx | C9B9F9B47190CFB5064ED03B362997BA1CE5452FFEC256BA6F3B169305181688 |
+
 
 We have used the nameservice code that we have improved.  
 You can find the informations here:  
