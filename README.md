@@ -8,6 +8,7 @@
 *   [What is Huahua-name?](#what-is-huahua-name "What is Huahua-name?")
 *   [Current contract](#current-contract "Current contract")
 *   [Current config](#current-config "Current config")
+*   [Check smartcontract](#check-smartcontract "Check smartcontract")
 *   [Use contract](#use-contract "Use contract")
 *   [Credits](#credits "Credits")
 
@@ -20,7 +21,7 @@ It is also possible to transfer the names to another address.
 You can perform these actions from chihuahuad or from our interface on [huahua-name.wtf](https://huahua-name.wtf/)  
 
 
-### Current contract ###
+### Current contract  ###
 
 | Key | Value |
 |--|--|
@@ -38,6 +39,35 @@ You can perform these actions from chihuahuad or from our interface on [huahua-n
 | purchase_price  | 20000 HUAHUA |
 | transfer_price | 20000 HUAHUA |
 | edit_price | 1000 HUAHUA | 
+
+
+### Check smartcontract ###
+
+Donwload curent smartcontract:
+
+```
+chihuahuad query wasm code 157 download.wasm
+openssl sha1 download.wasm
+```
+
+Result
+```
+SHA1(download.wasm)= fbf78f7cab54af4cd2c990512b98140a9c152f2c
+```  
+
+Compare the sha1 of the online contract with the github sources
+
+```
+openssl sha1 artifacts/cw_huahua_name.wasm
+```
+
+Result
+```
+SHA1(artifacts/cw_huahua_name.wasm)= fbf78f7cab54af4cd2c990512b98140a9c152f2c
+```
+
+The contract used on the chihuahua mainnet is exactly the same as the github sources!
+
 
 ### Use contract ###
 
