@@ -5,8 +5,6 @@
 
 # Huahua-name
 
-* * *
-
 *   [What is Huahua-name?](#what-is-huahua-name "What is Huahua-name?")
 *   [Current contract](#current-contract "Current contract")
 *   [Use contract](#use-contract "Use contract")
